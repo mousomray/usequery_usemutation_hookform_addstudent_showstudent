@@ -7,8 +7,9 @@ import Addstudent from './Pages/Addstudent'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Showstudent from './Pages/Showstudent'
 
-import { ToastContainer} from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Home from './Pages/Home'
 
 const App = () => {
 
@@ -17,12 +18,13 @@ const App = () => {
 
     return (
         <>
-        <ToastContainer/>
+            <ToastContainer />
             <QueryClientProvider client={queryClient}>
                 <Router>
                     <Navbar />
                     <Routes>
-                        <Route path='/' element={<Addstudent />} />
+                        <Route path='/' element={<Home />} />
+                        <Route path='/addstudent' element={<Addstudent />} />
                         <Route path='/showstudent' element={<Showstudent />} />
                     </Routes>
                 </Router>

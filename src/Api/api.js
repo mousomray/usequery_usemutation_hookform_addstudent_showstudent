@@ -8,6 +8,7 @@ export const addStudent = async (data) => {
 
     try {
        const response =  await axios.post(API_URL, data)
+       console.log("Fetching Add Student Data", response);
        toast.success(response?.data?.message) 
        return response?.data
     }

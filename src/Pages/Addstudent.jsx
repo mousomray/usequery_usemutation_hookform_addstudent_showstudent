@@ -25,42 +25,58 @@ const Addstudent = () => {
     const [loading, setLoading] = useState(false); // For Loading
 
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-        reset,
-    } = useForm();
+    const { register, handleSubmit, formState: { errors }, reset } = useForm();
 
-
+    // Function For Mutation
     const registerUser = async (data) => {
-        const response = await addStudent(data);
+
+        const myregdata = {
+            name: data.name,
+            email: data.email,
+            phone: data.phone,
+            city: data.city,
+            address: data.address,
+            state: data.state,
+            section: data.section,
+            classes: data.classes
+        }
+
+        const response = await addStudent(myregdata);
+        console.log("My Reg response is ", response);
+        // if (response && response?.message === "student added successfully") {
+        //     reset();
+        //     navigate('/showstudent');
+        //     setLoading(false);
+        // } else {
+        //     setLoading(false);
+        // }
         return response.data;
     };
 
-
-    // Mutation Area 
+    // Start Mutation Area
     const mutation = useMutation({
         mutationFn: (data) => registerUser(data),
-        onSuccess: (data) => {
+
+        // If Success
+        onSuccess: () => {
             setLoading(false)
             reset();
             navigate("/showstudent");
         },
-        onError: (error) => {
+
+        // If Error
+        onError: () => {
             // Add error handling logic here
             setLoading(false)
         },
-
-
     });
 
-    // Function For Handle Submit
-    const onSubmit = (e) => {
-        mutation.mutate(e);
-        setLoading(true)
-    };
 
+    // Handle On Submit Area
+    const onSubmit = (data) => {
+        mutation.mutate(data);
+        setLoading(true);
+    };
 
 
     return (
@@ -97,106 +113,167 @@ const Addstudent = () => {
                             sx={{ mt: 3 }}
                         >
                             <Grid container spacing={2}>
+
                                 <Grid item xs={12}>
                                     <TextField
                                         required
                                         fullWidth
                                         id="name"
                                         label="Name"
-                                        {...register("name", { required: true, minLength: 3 })}
+                                        {...register("name", {
+                                            required: "This field is Required",
+                                            minLength: {
+                                                value: 3,
+                                                message: "Name must be atleast 3 characters"
+                                            }
+                                        })}
                                     />
-                                    {errors.name && (
-                                        <p style={{ color: "red" }}>This field is required</p>
+                                    {errors?.name && (
+                                        <p style={{ color: 'red' }}>{errors.name.message}</p>
                                     )}
                                 </Grid>
+
+
                                 <Grid item xs={12}>
                                     <TextField
                                         required
                                         fullWidth
+                                        type="email"
                                         id="email"
-                                        label="Email Address"
-                                        {...register("email", { required: true, maxLength: 50 })}
-                                        autoComplete="email"
+                                        label="Email"
+                                        {...register("email", {
+                                            required: "This field is required",
+                                            pattern: {
+                                                value: /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                                                message: "Email Pattern should be xyz@gmail.com",
+                                            },
+                                        })}
                                     />
-                                    {errors.email && (
-                                        <p style={{ color: "red" }}>This field is required</p>
-                                    )}
+                                    {errors.email && <p style={{ color: 'red' }}>{errors.email.message}</p>}
                                 </Grid>
+
+
                                 <Grid item xs={12}>
                                     <TextField
                                         required
                                         fullWidth
+                                        type="number"
                                         id="phone"
                                         label="Phone"
-                                        {...register("phone", { required: true, maxLength: 10 })}
+                                        {...register("phone", {
+                                            required: "This field is Required",
+                                            minLength: {
+                                                value: 10,
+                                                message: "Phone number must be 10 characters"
+                                            },
+                                            maxLength: {
+                                                value: 10,
+                                                message: "Phone number must be 10 characters"
+                                            }
+                                        })}
                                     />
-                                    {errors.phone && (
-                                        <p style={{ color: "red" }}>This field is required</p>
+                                    {errors?.phone && (
+                                        <p style={{ color: 'red' }}>{errors.phone.message}</p>
                                     )}
                                 </Grid>
+
+
                                 <Grid item xs={12}>
                                     <TextField
                                         required
                                         fullWidth
-                                        {...register("city", { required: true, minLength: 3 })}
-                                        label="City"
-                                        type="text"
                                         id="city"
+                                        label="City"
+                                        {...register("city", {
+                                            required: "This field is Required",
+                                            minLength: {
+                                                value: 3,
+                                                message: "City must be atleast 3 characters"
+                                            }
+                                        })}
                                     />
-                                    {errors.city && (
-                                        <p style={{ color: "red" }}>This field is required</p>
+                                    {errors?.city && (
+                                        <p style={{ color: 'red' }}>{errors.city.message}</p>
                                     )}
                                 </Grid>
+
+
                                 <Grid item xs={12}>
                                     <TextField
                                         required
                                         fullWidth
-                                        {...register("address", { required: true, minLength: 3 })}
-                                        label="Address"
-                                        type="text"
                                         id="address"
+                                        label="Address"
+                                        {...register("address", {
+                                            required: "This field is Required",
+                                            minLength: {
+                                                value: 3,
+                                                message: "Address must be atleast 3 characters"
+                                            }
+                                        })}
                                     />
-                                    {errors.address && (
-                                        <p style={{ color: "red" }}>This field is required</p>
+                                    {errors?.address && (
+                                        <p style={{ color: 'red' }}>{errors.address.message}</p>
                                     )}
                                 </Grid>
+
+
                                 <Grid item xs={12}>
                                     <TextField
                                         required
                                         fullWidth
-                                        {...register("state", { required: true, minLength: 3 })}
-                                        label="State"
-                                        type="text"
                                         id="state"
+                                        label="State"
+                                        {...register("state", {
+                                            required: "This field is Required",
+                                            minLength: {
+                                                value: 3,
+                                                message: "State must be atleast 3 characters"
+                                            }
+                                        })}
                                     />
-                                    {errors.state && (
-                                        <p style={{ color: "red" }}>This field is required</p>
+                                    {errors?.state && (
+                                        <p style={{ color: 'red' }}>{errors.state.message}</p>
                                     )}
                                 </Grid>
+
+
                                 <Grid item xs={12}>
                                     <TextField
                                         required
                                         fullWidth
-                                        {...register("section", { required: true, minLength: 3 })}
-                                        label="Section"
-                                        type="text"
                                         id="section"
+                                        label="Section"
+                                        {...register("section", {
+                                            required: "This field is Required",
+                                            minLength: {
+                                                value: 3,
+                                                message: "Section must be atleast 3 characters"
+                                            }
+                                        })}
                                     />
-                                    {errors.section && (
-                                        <p style={{ color: "red" }}>This field is required</p>
+                                    {errors?.section && (
+                                        <p style={{ color: 'red' }}>{errors.section.message}</p>
                                     )}
                                 </Grid>
+
+
                                 <Grid item xs={12}>
                                     <TextField
                                         required
                                         fullWidth
-                                        {...register("classes", { required: true, minLength: 3 })}
-                                        label="Classes"
-                                        type="text"
                                         id="classes"
+                                        label="Classes"
+                                        {...register("classes", {
+                                            required: "This field is Required",
+                                            minLength: {
+                                                value: 3,
+                                                message: "Class must be atleast 3 characters"
+                                            }
+                                        })}
                                     />
-                                    {errors.classes && (
-                                        <p style={{ color: "red" }}>This field is required</p>
+                                    {errors?.classes && (
+                                        <p style={{ color: 'red' }}>{errors.classes.message}</p>
                                     )}
                                 </Grid>
 
