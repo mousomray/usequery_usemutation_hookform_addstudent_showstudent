@@ -1,6 +1,6 @@
 import React from 'react'
 import { useQuery } from '@tanstack/react-query' // Import for useQuery 
-import { showstudent } from '../Api/api'
+import { showstudent } from '../Api/apicall'
 import { styled } from '@mui/material/styles';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -34,11 +34,11 @@ const User = () => {
 
     const getUserdata = async () => {
         const response = await showstudent()
-        console.log("Fetching Student data", response);
-        return response?.data?.data // You have to put return because there is no state
+        console.log("Student List ", response);
+        return response// You have to put return because there is no state
     }
 
-    const { isLoading, isError, data, error } = useQuery({
+    const { isLoading, isError, data:mydata, error } = useQuery({
         queryKey: ['user'],
         queryFn: getUserdata // This line of code work as same as useEffect()
     })
@@ -75,7 +75,7 @@ const User = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {data.slice(0, data.length).reverse()?.map((row) => (
+                        {mydata?.slice(0, mydata.length).reverse()?.map((row) => (
                             <StyledTableRow key={row.name}>
                                 <StyledTableCell component="th" scope="row">
                                     {row.name}

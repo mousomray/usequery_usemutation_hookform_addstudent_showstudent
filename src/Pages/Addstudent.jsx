@@ -1,36 +1,35 @@
-import React, { useState } from "react";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
-import TextField from "@mui/material/TextField";
-import Grid from "@mui/material/Grid";
-import Box from "@mui/material/Box";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container";
-import Paper from "@mui/material/Paper";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import React, { useState, useEffect } from 'react'
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
+import CssBaseline from '@mui/material/CssBaseline';
+import TextField from '@mui/material/TextField';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
+import { Link } from 'react-router-dom'
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import Typography from '@mui/material/Typography';
+import Container from '@mui/material/Container';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
-import { addStudent } from "../Api/api"
-
+import { addStudent } from '../Api/apicall';
+import { useNavigate } from 'react-router-dom';
 
 const defaultTheme = createTheme();
 
-
 const Addstudent = () => {
-    const navigate = useNavigate();
 
-    const [loading, setLoading] = useState(false); // For Loading
-
-
+    const navigate = useNavigate()
     const { register, handleSubmit, formState: { errors }, reset } = useForm();
+    const [loading, setLoading] = useState(false);
 
-    // Function For Mutation
-    const registerUser = async (data) => {
+    const reg = async (data) => {
 
-        const myregdata = {
+        setLoading(true);
+
+        const amardata = {
             name: data.name,
             email: data.email,
             phone: data.phone,
@@ -41,98 +40,83 @@ const Addstudent = () => {
             classes: data.classes
         }
 
-        const response = await addStudent(myregdata);
-        console.log("My Reg response is ", response);
-        // if (response && response?.message === "student added successfully") {
-        //     reset();
-        //     navigate('/showstudent');
-        //     setLoading(false);
-        // } else {
-        //     setLoading(false);
-        // }
-        return response.data;
+        try {
+            const response = await addStudent(amardata)
+            console.log("My Addstudent response is ", response);
+            if (response && response?.status === 200) {
+                reset(); // Blank form after submitting data
+                navigate("/showstudent");
+                setLoading(false);
+            } else {
+                setLoading(false);
+            }
+            return response
+        } catch (error) {
+            console.log("Error is make", error);
+            setLoading(false);
+        }
+
     };
 
     // Start Mutation Area
     const mutation = useMutation({
-        mutationFn: (data) => registerUser(data),
-
-        // If Success
-        onSuccess: () => {
-            setLoading(false)
-            reset();
-            navigate("/showstudent");
-        },
-
-        // If Error
-        onError: () => {
-            // Add error handling logic here
-            setLoading(false)
-        },
+        mutationFn: reg,
     });
 
 
     // Handle On Submit Area
     const onSubmit = (data) => {
         mutation.mutate(data);
-        setLoading(true);
     };
 
 
     return (
-        <ThemeProvider theme={defaultTheme}>
-            <Container component="main" maxWidth="xs">
-                <Paper
-                    elevation={5}
-                    style={{
-                        padding: "1rem 3rem",
-                        marginTop: "1rem",
-                        width: "35rem",
-                        marginBottom: "1rem",
-                    }}
-                >
+        <>
+
+            <ThemeProvider theme={defaultTheme}>
+                <Container component="main" maxWidth="xs">
                     <CssBaseline />
                     <Box
                         sx={{
-                            marginTop: 8,
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
+                            marginTop: 15,
+                            marginBottom: 8,
+                            padding: 2,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.12)'
                         }}
                     >
-                        <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+                        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
                             <LockOutlinedIcon />
                         </Avatar>
                         <Typography component="h1" variant="h5">
-                            Add Student
+                            Addstudent
                         </Typography>
-                        <Box
-                            component="form"
-                            noValidate
-                            onSubmit={handleSubmit(onSubmit)}
-                            sx={{ mt: 3 }}
-                        >
+                        <Box component="form" noValidate sx={{ mt: 1 }} onSubmit={handleSubmit(onSubmit)}>
+
                             <Grid container spacing={2}>
 
                                 <Grid item xs={12}>
                                     <TextField
                                         required
                                         fullWidth
+                                        type="text"
                                         id="name"
                                         label="Name"
                                         {...register("name", {
                                             required: "This field is Required",
                                             minLength: {
                                                 value: 3,
-                                                message: "Name must be atleast 3 characters"
+                                                message: "Name must be 2 characters"
                                             }
                                         })}
                                     />
                                     {errors?.name && (
                                         <p style={{ color: 'red' }}>{errors.name.message}</p>
                                     )}
-                                </Grid>
 
+                                </Grid>
 
                                 <Grid item xs={12}>
                                     <TextField
@@ -152,7 +136,6 @@ const Addstudent = () => {
                                     {errors.email && <p style={{ color: 'red' }}>{errors.email.message}</p>}
                                 </Grid>
 
-
                                 <Grid item xs={12}>
                                     <TextField
                                         required
@@ -164,24 +147,25 @@ const Addstudent = () => {
                                             required: "This field is Required",
                                             minLength: {
                                                 value: 10,
-                                                message: "Phone number must be 10 characters"
+                                                message: "Phone number must be atleast 10 characters"
                                             },
                                             maxLength: {
                                                 value: 10,
-                                                message: "Phone number must be 10 characters"
+                                                message: "Phone number must be atleast 10 characters"
                                             }
                                         })}
                                     />
                                     {errors?.phone && (
                                         <p style={{ color: 'red' }}>{errors.phone.message}</p>
                                     )}
-                                </Grid>
 
+                                </Grid>
 
                                 <Grid item xs={12}>
                                     <TextField
                                         required
                                         fullWidth
+                                        type="text"
                                         id="city"
                                         label="City"
                                         {...register("city", {
@@ -195,13 +179,14 @@ const Addstudent = () => {
                                     {errors?.city && (
                                         <p style={{ color: 'red' }}>{errors.city.message}</p>
                                     )}
-                                </Grid>
 
+                                </Grid>
 
                                 <Grid item xs={12}>
                                     <TextField
                                         required
                                         fullWidth
+                                        type="text"
                                         id="address"
                                         label="Address"
                                         {...register("address", {
@@ -215,13 +200,14 @@ const Addstudent = () => {
                                     {errors?.address && (
                                         <p style={{ color: 'red' }}>{errors.address.message}</p>
                                     )}
-                                </Grid>
 
+                                </Grid>
 
                                 <Grid item xs={12}>
                                     <TextField
                                         required
                                         fullWidth
+                                        type="text"
                                         id="state"
                                         label="State"
                                         {...register("state", {
@@ -235,15 +221,16 @@ const Addstudent = () => {
                                     {errors?.state && (
                                         <p style={{ color: 'red' }}>{errors.state.message}</p>
                                     )}
-                                </Grid>
 
+                                </Grid>
 
                                 <Grid item xs={12}>
                                     <TextField
                                         required
                                         fullWidth
+                                        type="text"
                                         id="section"
-                                        label="Section"
+                                        label="City"
                                         {...register("section", {
                                             required: "This field is Required",
                                             minLength: {
@@ -255,44 +242,50 @@ const Addstudent = () => {
                                     {errors?.section && (
                                         <p style={{ color: 'red' }}>{errors.section.message}</p>
                                     )}
-                                </Grid>
 
+                                </Grid>
 
                                 <Grid item xs={12}>
                                     <TextField
                                         required
                                         fullWidth
+                                        type="text"
                                         id="classes"
                                         label="Classes"
                                         {...register("classes", {
                                             required: "This field is Required",
                                             minLength: {
                                                 value: 3,
-                                                message: "Class must be atleast 3 characters"
+                                                message: "Classes must be atleast 3 characters"
                                             }
                                         })}
                                     />
                                     {errors?.classes && (
                                         <p style={{ color: 'red' }}>{errors.classes.message}</p>
                                     )}
+
                                 </Grid>
 
-
                             </Grid>
+
+
                             <Button
                                 type="submit"
                                 fullWidth
                                 variant="contained"
                                 sx={{ mt: 3, mb: 2 }}
                             >
-                                {loading ? "Loading..." : "Add Student"}
+                                {loading ? 'Please wait...' : 'Addstudent'}
                             </Button>
+
                         </Box>
                     </Box>
-                </Paper>
-            </Container>
-        </ThemeProvider>
-    );
-};
+                </Container>
+            </ThemeProvider>
 
-export default Addstudent;
+
+        </>
+    )
+}
+
+export default Addstudent

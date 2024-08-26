@@ -1,32 +1,19 @@
-import axios from "axios"
-import { toast } from "react-toastify"
+import axios from "axios";
 
-// Add Student  
-export const addStudent = async (data) => {
-    
-    const API_URL = 'https://tureappservar.onrender.com/student/create'
+const axiosInstance = axios.create({
+    baseURL: "https://tureappservar.onrender.com/student/"
+})
 
-    try {
-       const response =  await axios.post(API_URL, data)
-       console.log("Fetching Add Student Data", response);
-       toast.success(response?.data?.message) 
-       return response?.data
+axiosInstance.interceptors.request.use(
+    async function(config){
+        let token = localStorage.getItem("token") || sessionStorage.getItem("token")
+        if(token !== null || token !== undefined){
+            config.headers["x-access-token"] = token
+        }
+        return config
+    },
+    function(error){
+        return Promise.reject(error)
     }
-    catch (error) {
-        console.log('Error while calling Add student data', error)
-        toast.error(error?.response?.data?.message)
-    }
-}
-
-// Show Student 
-export const showstudent = async () => {
-    
-    const API_URL = 'https://tureappservar.onrender.com/student/show'
-
-    try {
-        return await axios.get(API_URL)
-    }
-    catch (error) {
-        console.log('Error while calling All student data', error.message)
-    }
-}
+)
+export default axiosInstance
